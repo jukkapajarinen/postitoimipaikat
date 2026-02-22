@@ -50,28 +50,88 @@
 <script>
 const prefix = "PONOT20260221";
 
-fetch("PCF_20260221.dat")
-.then(response => response.arrayBuffer())   // read raw bytes
-.then(buffer => {
-  const decoder = new TextDecoder("iso-8859-1"); 
-  const text = decoder.decode(buffer);
+const digitInputs = document.querySelectorAll('input[type="number"]');
+const searchInput = document.querySelector('input[type="search"]');
+const list = document.getElementById("resultList");
 
+let postalData = []; // store all entries here
+
+// Load file
+fetch("PCF_20260221.dat")
+.then(response => response.arrayBuffer())
+.then(buffer => {
+  const decoder = new TextDecoder("iso-8859-1");
+  const text = decoder.decode(buffer);
   const lines = text.split(/\r?\n/);
-  const list = document.getElementById("resultList");
 
   lines.forEach(line => {
     if (!line.startsWith(prefix)) return;
 
     const afterPrefix = line.substring(prefix.length);
     const value = afterPrefix.split(" ")[0];
-
     if (!value) return;
 
     const postalCode = value.substring(0, 5);
-    const name = value.substring(5);
+    const name = value.substring(5).trim();
 
+    postalData.push({ postalCode, name });
+  });
+
+  renderList(postalData);
+});
+
+// Listen to digit inputs
+digitInputs.forEach((input, index) => {
+  input.addEventListener("input", (e) => {
+    // Allow only one digit
+    input.value = input.value.replace(/[^0-9]/g, "").slice(0, 1);
+
+    if (input.value && index < digitInputs.length - 1) {
+      digitInputs[index + 1].focus();
+    }
+
+    filterResults();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    // Go back on backspace if empty
+    if (e.key === "Backspace" && !input.value && index > 0) {
+      digitInputs[index - 1].focus();
+    }
+  });
+});
+
+// Listen to name search
+searchInput.addEventListener("input", filterResults);
+
+function filterResults() {
+  const digitFilter = Array.from(digitInputs)
+    .map(i => i.value)
+    .join("");
+
+  const nameFilter = searchInput.value.toLowerCase().trim();
+
+  const filtered = postalData.filter(item => {
+    const matchDigits = digitFilter
+      ? item.postalCode.startsWith(digitFilter)
+      : true;
+
+    const matchName = nameFilter
+      ? item.name.toLowerCase().includes(nameFilter)
+      : true;
+
+    return matchDigits && matchName;
+  });
+
+  renderList(filtered);
+}
+
+function renderList(data) {
+  list.innerHTML = "";
+
+  data.forEach(item => {
     const li = document.createElement("li");
-    li.className = "text-2xl";
+    li.className = "text-3xl";
 
     const colors = [
       "text-blue-600",
@@ -81,9 +141,9 @@ fetch("PCF_20260221.dat")
       "text-purple-600"
     ];
 
-    postalCode.split("").forEach((digit, index) => {
+    item.postalCode.split("").forEach((digit, index) => {
       const span = document.createElement("span");
-      span.className = colors[index];
+      span.className = colors[index] + " font-bold";
       span.textContent = digit;
       li.appendChild(span);
     });
@@ -95,12 +155,12 @@ fetch("PCF_20260221.dat")
 
     const nameSpan = document.createElement("span");
     nameSpan.className = "ml-6 text-black";
-    nameSpan.textContent = name;
+    nameSpan.textContent = item.name;
     li.appendChild(nameSpan);
 
     list.appendChild(li);
   });
-});
+}
 </script>
 
 </body>
