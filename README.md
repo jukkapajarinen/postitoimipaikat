@@ -1,6 +1,8 @@
 # Postinumerot
 
-Suomen postinumerot kätevässä haussa / suodattimessa.
+Suomen postinumerot kätevässä haussa / suodattimessa.  
+Data on haettu manuaalisesti Postin julkaisemista postinumerotiedostoista.  
+- Reference: [Postin postinumerotiedostot](https://www.posti.fi/yrityksille/asiakastuki/postinumerotiedostot)
 
 ## Author
 
