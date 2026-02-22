@@ -105,16 +105,16 @@ digitInputs.forEach((input, index) => {
 searchInput.addEventListener("input", filterResults);
 
 function filterResults() {
-  const digitFilter = Array.from(digitInputs)
-    .map(i => i.value)
-    .join("");
-
+  const digits = Array.from(digitInputs).map(i => i.value);
   const nameFilter = searchInput.value.toLowerCase().trim();
 
   const filtered = postalData.filter(item => {
-    const matchDigits = digitFilter
-      ? item.postalCode.startsWith(digitFilter)
-      : true;
+
+    // Check each digit position individually
+    const matchDigits = digits.every((digit, index) => {
+      if (!digit) return true; // empty field = ignore
+      return item.postalCode[index] === digit;
+    });
 
     const matchName = nameFilter
       ? item.name.toLowerCase().includes(nameFilter)
