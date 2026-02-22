@@ -1,6 +1,6 @@
-# Postitoimipaikat
+# Postinumerot
 
-Suomen postitoimipaikat.
+Suomen postinumerot kätevässä haussa / suodattimessa.
 
 ## Author
 
